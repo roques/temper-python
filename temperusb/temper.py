@@ -304,7 +304,8 @@ class TemperDevice(object):
         # Interpret device response
         for sensor in _sensors:
             offset = self.lookup_offset(sensor)
-            celsius = data[offset] + data[offset+1] / 256.0
+            raw = (data[offset] << 8) + data[offset+1]
+            celsius = (raw if raw < 0x8000 else raw - 0x10000) / 256.0
             celsius = celsius * self._scale + self._offset
             results[sensor] = {
                 'ports': self.get_ports(),
